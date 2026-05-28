@@ -1,4 +1,4 @@
-# LoveMarkdown / LovePrompt
+# LovePrompt
 
 LovePrompt converts PDFs, DOCX, PPTX, TXT, and other files into clean Markdown optimized for LLMs (Claude, ChatGPT, etc.) using [Microsoft MarkItDown](https://github.com/microsoft/markitdown).
 

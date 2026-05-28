@@ -43,20 +43,29 @@ export default function App() {
 
   const onExport = async () => {
     if (!result) return
-    const response = await fetch(`${API_URL}/api/export`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(result)
-    })
+    setError('')
+    try {
+      const response = await fetch(`${API_URL}/api/export`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(result)
+      })
+      if (!response.ok) {
+        throw new Error('Export failed')
+      }
 
-    const markdown = await response.text()
-    const blob = new Blob([markdown], { type: 'text/markdown' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${result.filename.replace(/\.[^.]+$/, '')}.md`
-    a.click()
-    URL.revokeObjectURL(url)
+      const markdown = await response.text()
+      const blob = new Blob([markdown], { type: 'text/markdown' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      const filename = result.filename || 'document'
+      a.href = url
+      a.download = `${filename.replace(/\.[^.]+$/, '')}.md`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
   return (

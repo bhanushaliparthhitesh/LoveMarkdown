@@ -3,6 +3,11 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+try:
+    import tiktoken  # type: ignore
+except ImportError:  # pragma: no cover - optional dependency fallback
+    tiktoken = None
+
 
 def optimize_markdown(markdown: str) -> str:
     """Normalize noisy spacing while preserving markdown structure."""
@@ -25,13 +30,14 @@ def optimize_markdown(markdown: str) -> str:
 def estimate_tokens(text: str) -> int:
     """Estimate token count with tiktoken when available."""
     try:
-        import tiktoken  # type: ignore
-
-        encoder = tiktoken.get_encoding("cl100k_base")
-        return len(encoder.encode(text))
+        if tiktoken is not None:
+            encoder = tiktoken.get_encoding("cl100k_base")
+            return len(encoder.encode(text))
     except Exception:
-        words = len(re.findall(r"\S+", text))
-        return max(1, int(words * 1.3)) if text.strip() else 0
+        pass
+
+    words = len(re.findall(r"\S+", text))
+    return int(words * 1.3) if words > 0 else 0
 
 
 def convert_file_to_markdown(path: Path) -> str:
